@@ -3340,6 +3340,11 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_originate(switch_core_session_t *sess
 								}
 							}
 						}
+						
+						if (!ok) {
+							oglobals.idx = IDX_KEY_CANCEL;
+							goto notready;
+						}
 					}
 					if (!ok) {
 						oglobals.idx = IDX_TIMEOUT;
@@ -3725,6 +3730,12 @@ SWITCH_DECLARE(switch_status_t) switch_ivr_originate(switch_core_session_t *sess
 							}
 						}
 					}
+					
+					if(switch_stristr("loopback", switch_channel_get_variable(caller_channel, "source"))
+							&& switch_channel_get_cause(caller_channel) == SWITCH_CAUSE_LOSE_RACE){
+						reason = SWITCH_CAUSE_LOSE_RACE;
+					}
+					
 					if (switch_channel_up_nosig(oglobals.originate_status[i].peer_channel)) {
 						if (caller_channel && i == 0) {
 							holding = switch_channel_get_variable(caller_channel, SWITCH_SOFT_HOLDING_UUID_VARIABLE);
